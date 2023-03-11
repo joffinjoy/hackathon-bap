@@ -74,7 +74,7 @@ exports.addProfile = async (req, res) => {
 			},
 		})
 		if (!response.status) return failedRes()
-		responses.success(res, 'Profile Created Successfully', newProfile)
+		responses.successCreated(res, 'Profile Created Successfully', newProfile)
 	} catch (err) {
 		console.log(err)
 		failedRes()
