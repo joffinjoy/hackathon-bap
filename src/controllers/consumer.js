@@ -2,7 +2,8 @@
 const { itemAttendanceQueries } = require('@database/storage/itemAttendance/queries')
 const { itemQueries } = require('@database/storage/item/queries')
 const { internalRequests } = require('@helpers/requests')
-const rfdc = require('rfdc')()
+const { responses } = require('@helpers/responses')
+const { recommendationService } = require('@services/recommendation')
 
 const getConfirmedList = async (req, res) => {
 	try {
@@ -20,24 +21,19 @@ const getConfirmedList = async (req, res) => {
 				}
 			})
 		)
-		res.status(200).json({
-			status: true,
-			message: 'Fetched Confirmed List',
-			data: attendances,
-		})
+		responses.success(res, 'Fetched Confirmed List', attendances)
 	} catch (err) {
 		console.log(err)
 	}
 }
 
 const markAttendanceCompleted = async (req, res) => {
-	const failedRes = (message) => res.status(400).json({ status: false, message })
 	try {
 		const userId = req.user.id
 		const orderId = req.body.orderId
 		const rating = req.body.rating
 		const itemAttendance = await itemAttendanceQueries.findOne({ orderId, userMongoId: userId })
-		if (!itemAttendance) return failedRes('Attendance Not Found')
+		if (!itemAttendance) return responses.failBad(res, 'Attendance Not Found')
 		const updatedAttendance = await itemAttendanceQueries.setAsCompleted(orderId, rating)
 		const item = await itemQueries.findById(itemAttendance.itemMongoId)
 		const response = await internalRequests.recommendationPOST({
@@ -49,64 +45,23 @@ const markAttendanceCompleted = async (req, res) => {
 			},
 		})
 		if (!response.status) throw 'Neo4j Item Injection Failed'
-		res.status(200).json({
-			status: true,
-			message: `Recommendations For User ${userId} Retrieved`,
-			data: updatedAttendance,
-		})
+		responses.success(res, 'Item Marked As Completed', updatedAttendance)
 	} catch (err) {
 		console.log(err)
+		responses.failBad(res, 'Something Went Wrong')
 	}
 }
 
 const getRecommendations = async (req, res) => {
-	const failedRes = (message) => res.status(400).json({ status: false, message })
 	try {
 		const userId = req.user.id
 		const type = req.body.type
-		const response = await internalRequests.recommendationPOST({
-			route: process.env.RECOMMENDATION_GET_RECOMMENDATIONS,
-			body: {
-				userId,
-			},
-		})
-		if (!response.status) failedRes('Something Went Wrong!')
-		const recommendedItems = response.data
-		const items = await Promise.all(
-			recommendedItems.map(async (item) => {
-				const itemDoc = await itemQueries.findByItemId(item.itemId)
-				return JSON.parse(itemDoc.details)
-			})
-		)
-		let recommendations
-		let listName
-		if (type === 'session') {
-			recommendations = items
-			listName = 'sessions'
-		} else {
-			listName = 'mentors'
-			const mentorMap = new Map()
-			items.map((item) => {
-				const mentorId = item.mentor.id
-				const itemCopy = rfdc(item)
-				delete itemCopy.mentor
-				const mentor = mentorMap.get(mentorId)
-				if (!mentor) mentorMap.set(item.mentor.id, { mentor: item.mentor, slots: [itemCopy] })
-				else {
-					const slots = mentor.slots
-					slots.push(itemCopy)
-					mentorMap.set(item.mentor.id, { mentor: item.mentor, slots })
-				}
-			})
-			recommendations = Array.from(mentorMap.values())
-		}
-		res.status(200).json({
-			status: true,
-			message: 'Recommendations For ' + userId,
-			data: { count: recommendations.length, [`${listName}`]: recommendations },
-		})
+		const recommendations = await recommendationService.getRecommendations({ userId, type })
+		if (!recommendations) return responses.failBad(res, 'Something Went Wrong')
+		responses.success(res, `Recommendations For ${userId}`, recommendations)
 	} catch (err) {
 		console.log(err)
+		responses.failBad(res, 'Something Went Wrong')
 	}
 }
 
