@@ -4,26 +4,25 @@ const { userQueries } = require('@database/storage/user/queries')
 const { profileQueries } = require('@database/storage/profile/queries')
 const authentication = require('@utils/authentication')
 const { internalRequests } = require('@helpers/requests')
+const { responses } = require('@helpers/responses')
 
 exports.login = async (req, res) => {
-	const errorResponse = () => res.status(401).json({ status: false, message: 'Authentication Failure' })
+	const errorResponse = () => responses.failUnauthenticated(res, 'Authentication Failure')
 	try {
 		const email = req.body.email
 		const password = req.body.password
+
 		const user = await userQueries.findByEmail(email)
 		if (!user) return errorResponse()
 		const isValidPassword = await authentication.verifyPassword(password, user.hash, user.salt)
 		if (!isValidPassword) return errorResponse()
 		const jwtTokens = await authentication.generateJWTs(user)
 		if (!jwtTokens) return errorResponse()
-		res.status(200).json({
-			status: true,
-			message: 'Login Successful',
-			data: {
-				email: user.email,
-				accessToken: jwtTokens.accessToken,
-				expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-			},
+
+		responses.success(res, 'Login Successful', {
+			email: user.email,
+			accessToken: jwtTokens.accessToken,
+			expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
 		})
 	} catch (err) {
 		errorResponse()
@@ -32,27 +31,23 @@ exports.login = async (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-	const emailAlreadyExistsRes = () => res.status(400).json({ status: false, message: 'Email Id Already Exists' })
-	const signUpFailedRes = () => res.status(400).json({ status: false, message: 'SignUp Failed' })
 	try {
 		const email = req.body.email
 		const password = req.body.password
-		if (await userQueries.findByEmail(email)) return emailAlreadyExistsRes()
+		if (await userQueries.findByEmail(email)) return responses.failBad(res, 'Email Id Already Exists')
+
 		const { salt, hash } = await authentication.generateHashAndSalt(password)
 		const user = await userQueries.create(email, hash, salt)
 		const jwtTokens = await authentication.generateJWTs(user)
 		if (!jwtTokens) {
 			await userQueries.deleteOne(user)
-			return signUpFailedRes()
+			return responses.failBad(res, 'SignUp Failed')
 		}
-		res.status(200).json({
-			status: true,
-			message: 'SignUp Successful',
-			data: {
-				email: user.email,
-				accessToken: jwtTokens.accessToken,
-				expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-			},
+
+		responses.successCreated(res, 'SignUp Successful', {
+			email: user.email,
+			accessToken: jwtTokens.accessToken,
+			expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
 		})
 	} catch (err) {
 		console.log(err)
@@ -60,7 +55,7 @@ exports.signup = async (req, res) => {
 }
 
 exports.addProfile = async (req, res) => {
-	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
+	const failedRes = () => responses.failBad(res, 'Profile Creation Failed')
 	try {
 		const userId = req.user.id
 		const user = await userQueries.findById(userId)
@@ -79,11 +74,7 @@ exports.addProfile = async (req, res) => {
 			},
 		})
 		if (!response.status) return failedRes()
-		res.status(200).json({
-			status: true,
-			message: 'Profile Created Successfully',
-			data: newProfile,
-		})
+		responses.success(res, 'Profile Created Successfully', newProfile)
 	} catch (err) {
 		console.log(err)
 		failedRes()
@@ -91,20 +82,14 @@ exports.addProfile = async (req, res) => {
 }
 
 exports.editProfile = async (req, res) => {
-	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
+	const failedRes = () => responses.failBad(res, 'Profile Update Failed')
 	try {
 		const userId = req.user.id
 		const name = req.body.name
 		const phone = req.body.phone
 		const updatedProfile = await profileQueries.updateByUserId(userId, { name, phone })
 		if (!updatedProfile) return failedRes()
-		else {
-			res.status(200).json({
-				status: true,
-				message: 'Profile Updated Successfully',
-				data: updatedProfile,
-			})
-		}
+		responses.success(res, 'Profile Updated Successfully', updatedProfile)
 	} catch (err) {
 		console.log(err)
 		failedRes()
@@ -112,18 +97,13 @@ exports.editProfile = async (req, res) => {
 }
 
 exports.getUserEmails = async (req, res) => {
-	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
 	try {
 		const response = await internalRequests.recommendationPOST({
 			route: process.env.RECOMMENDATION_GET_USER_EMAILS,
 		})
-		res.status(200).json({
-			status: true,
-			message: 'Request Success',
-			data: response.data,
-		})
+		responses.success(res, 'All User Emails Fetched', response.data)
 	} catch (err) {
 		console.log(err)
-		failedRes()
+		responses.failBad(res, 'Something Went Wrong')
 	}
 }

@@ -4,7 +4,7 @@ const { itemQueries } = require('@database/storage/item/queries')
 const { internalRequests } = require('@helpers/requests')
 const rfdc = require('rfdc')()
 
-exports.getConfirmedList = async (req, res) => {
+const getConfirmedList = async (req, res) => {
 	try {
 		const userId = req.user.id
 		const itemAttendances = await itemAttendanceQueries.findByUserMongoId(userId)
@@ -30,7 +30,7 @@ exports.getConfirmedList = async (req, res) => {
 	}
 }
 
-exports.markAttendanceCompleted = async (req, res) => {
+const markAttendanceCompleted = async (req, res) => {
 	const failedRes = (message) => res.status(400).json({ status: false, message })
 	try {
 		const userId = req.user.id
@@ -59,7 +59,7 @@ exports.markAttendanceCompleted = async (req, res) => {
 	}
 }
 
-exports.getRecommendations = async (req, res) => {
+const getRecommendations = async (req, res) => {
 	const failedRes = (message) => res.status(400).json({ status: false, message })
 	try {
 		const userId = req.user.id
@@ -110,36 +110,10 @@ exports.getRecommendations = async (req, res) => {
 	}
 }
 
-exports.triggerProjectionAndKNN = async (req, res) => {
-	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
-	try {
-		const response = await internalRequests.recommendationPOST({
-			route: process.env.RECOMMENDATION_TRIGGER_PROJECTION_KNN,
-		})
-		res.status(200).json({
-			status: true,
-			message: 'Request Success',
-			data: response.data,
-		})
-	} catch (err) {
-		failedRes('Something Went Wrong')
-		console.log(err)
-	}
+const consumerController = {
+	getConfirmedList,
+	markAttendanceCompleted,
+	getRecommendations,
 }
 
-exports.setUniqueConstraints = async (req, res) => {
-	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
-	try {
-		const response = await internalRequests.recommendationPOST({
-			route: process.env.RECOMMENDATION_SET_UNIQUE_CONSTRAINTS,
-		})
-		res.status(200).json({
-			status: true,
-			message: 'Request Success',
-			data: response.data,
-		})
-	} catch (err) {
-		failedRes('Something Went Wrong')
-		console.log(err)
-	}
-}
+module.exports = consumerController
