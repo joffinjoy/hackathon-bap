@@ -61,21 +61,17 @@ exports.search = async (req, res) => {
 
 exports.onSearch = async (req, res) => {
 	try {
-		console.log(req.body)
 		const context = req.body.context
 		const bppUriFromContext = context.bpp_uri
 		const bppIdFromContext = context.bpp_id
-		//console.log(bppUriFromContext, bppIdFromContext)
 		const { bpp } = await bppQueries.findOrCreate({
 			where: { bppId: bppIdFromContext },
 			defaults: { bppUri: bppUriFromContext },
 		})
 		const transactionId = context.transaction_id
 		const bppMongoId = bpp._id
-		console.log('ID:', bpp)
 		const providers = req.body.message.catalog.providers
 		const isCatalogHandled = await catalogService.catalogHandler(providers, transactionId, bppMongoId)
-		console.log(isCatalogHandled)
 		res.status(200).json({
 			status: true,
 			message: 'On_Search Success',

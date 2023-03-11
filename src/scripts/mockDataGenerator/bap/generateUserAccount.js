@@ -13,9 +13,7 @@ exports.signup = async (data) => {
 	try {
 		config.url = 'http://localhost:3015/osl-bap/user/signup'
 		config.data = JSON.stringify(data)
-		console.log(config)
 		const response = await axios(config)
-		//console.log(response.data.result)
 		return response.data.data
 	} catch (err) {
 		console.log(err)
@@ -39,9 +37,7 @@ exports.addProfile = async (authToken, data) => {
 		config.headers['Authorization'] = 'Bearer ' + authToken
 		config.url = 'http://localhost:3015/osl-bap/user/profile/add'
 		config.data = JSON.stringify(data)
-		console.log(config)
 		const response = await axios(config)
-		//console.log(response.data.result)
 		return response.data.data
 	} catch (err) {
 		console.log(err)

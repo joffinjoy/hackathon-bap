@@ -37,8 +37,6 @@ exports.signup = async (req, res) => {
 	try {
 		const email = req.body.email
 		const password = req.body.password
-		console.log('EMAIL: ', email)
-		console.log('PASSWORD: ', password)
 		if (await userQueries.findByEmail(email)) return emailAlreadyExistsRes()
 		const { salt, hash } = await authentication.generateHashAndSalt(password)
 		const user = await userQueries.create(email, hash, salt)
