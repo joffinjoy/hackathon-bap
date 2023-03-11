@@ -90,7 +90,7 @@ exports.addProfile = async (req, res) => {
 	}
 }
 
-/* exports.editProfile = async (req, res) => {
+exports.editProfile = async (req, res) => {
 	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
 	try {
 		const userId = req.user.id
@@ -101,7 +101,7 @@ exports.addProfile = async (req, res) => {
 		else {
 			res.status(200).json({
 				status: true,
-				message: 'Profile Created Successfully',
+				message: 'Profile Updated Successfully',
 				data: updatedProfile,
 			})
 		}
@@ -110,7 +110,6 @@ exports.addProfile = async (req, res) => {
 		failedRes()
 	}
 }
- */
 
 exports.getUserEmails = async (req, res) => {
 	const failedRes = () => res.status(400).json({ status: false, message: 'Profile Creation Failed' })
