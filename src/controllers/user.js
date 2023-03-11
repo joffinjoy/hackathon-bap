@@ -6,7 +6,7 @@ const authentication = require('@utils/authentication')
 const { internalRequests } = require('@helpers/requests')
 const { responses } = require('@helpers/responses')
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
 	const errorResponse = () => responses.failUnauthenticated(res, 'Authentication Failure')
 	try {
 		const email = req.body.email
@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
 	}
 }
 
-exports.signup = async (req, res) => {
+const signup = async (req, res) => {
 	try {
 		const email = req.body.email
 		const password = req.body.password
@@ -54,7 +54,7 @@ exports.signup = async (req, res) => {
 	}
 }
 
-exports.addProfile = async (req, res) => {
+const addProfile = async (req, res) => {
 	const failedRes = () => responses.failBad(res, 'Profile Creation Failed')
 	try {
 		const userId = req.user.id
@@ -81,7 +81,7 @@ exports.addProfile = async (req, res) => {
 	}
 }
 
-exports.editProfile = async (req, res) => {
+const editProfile = async (req, res) => {
 	const failedRes = () => responses.failBad(res, 'Profile Update Failed')
 	try {
 		const userId = req.user.id
@@ -96,7 +96,7 @@ exports.editProfile = async (req, res) => {
 	}
 }
 
-exports.getUserEmails = async (req, res) => {
+const getUserEmails = async (req, res) => {
 	try {
 		const response = await internalRequests.recommendationPOST({
 			route: process.env.RECOMMENDATION_GET_USER_EMAILS,
@@ -107,3 +107,13 @@ exports.getUserEmails = async (req, res) => {
 		responses.failBad(res, 'Something Went Wrong')
 	}
 }
+
+const userController = {
+	login,
+	signup,
+	addProfile,
+	editProfile,
+	getUserEmails,
+}
+
+module.exports = userController
