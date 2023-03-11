@@ -14,9 +14,7 @@ exports.generateSession = async (authToken, data) => {
 	try {
 		config.headers['X-auth-token'] = 'bearer ' + authToken
 		config.data = JSON.stringify(data)
-		//console.log(config)
 		const response = await axios(config)
-		//console.log(response.data.result)
 		return response.data.result
 	} catch (err) {
 		console.log(err)

@@ -62,7 +62,6 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 					return menteeType.descriptor
 				})
 				const itemFulfillment = fulfillments.find((fulfillment) => fulfillment.id === fulfillmentId)
-				console.log(itemFulfillment)
 				const mentorInfo = {
 					id: itemFulfillment.mentor.id,
 					name: itemFulfillment.mentor.name,
@@ -103,9 +102,7 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 					where: { itemId },
 					defaults: { details: JSON.stringify(session), bppMongoId },
 				})
-				console.log(response)
 				if (!response.status) throw 'Neo4j Item Injection Failed'
-				console.log('BPP MONGO ID:', bppMongoId)
 				await cacheSave(`SESSION:BPP_ID:${itemId}`, bppMongoId)
 				const sessionsList = await cacheGet(`SESSION_LIST:${transactionId}`)
 				if (!sessionsList) await cacheSave(`SESSION_LIST:${transactionId}`, [itemId])

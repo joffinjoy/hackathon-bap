@@ -36,8 +36,6 @@ exports.markAttendanceCompleted = async (req, res) => {
 		const userId = req.user.id
 		const orderId = req.body.orderId
 		const rating = req.body.rating
-		console.log(userId)
-		console.log(orderId)
 		const itemAttendance = await itemAttendanceQueries.findOne({ orderId, userMongoId: userId })
 		if (!itemAttendance) return failedRes('Attendance Not Found')
 		const updatedAttendance = await itemAttendanceQueries.setAsCompleted(orderId, rating)
@@ -50,7 +48,6 @@ exports.markAttendanceCompleted = async (req, res) => {
 				rating,
 			},
 		})
-		console.log(response)
 		if (!response.status) throw 'Neo4j Item Injection Failed'
 		res.status(200).json({
 			status: true,

@@ -8,13 +8,9 @@ const jwt = require('jsonwebtoken')
 const pathToAccessPrivateKey = path.join(__dirname, '..', 'keys/access_rsa_priv.pem')
 const accessPrivateKey = fs.readFileSync(pathToAccessPrivateKey, 'utf8')
 
-//console.log(accessPrivateKey)
-
 //Public RSA Key For ACCESS TOKEN
 const pathToAccessPublicKey = path.join(__dirname, '..', 'keys/access_rsa_pub.pem')
 const accessPublicKey = fs.readFileSync(pathToAccessPublicKey, 'utf8')
-
-//console.log(accessPublicKey)
 
 exports.generateHashAndSalt = async (password) => {
 	try {

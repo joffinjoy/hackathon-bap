@@ -27,8 +27,6 @@ exports.confirm = async (req, res) => {
 
 		const userProfile = await profileQueries.findByUserId(userId)
 		const user = await userQueries.findById(userId)
-		console.log(user)
-		console.log(userProfile)
 
 		const message = confirmMessageDTO({
 			itemId,
@@ -65,7 +63,6 @@ exports.confirm = async (req, res) => {
 			where: { itemId },
 			defaults: { details: JSON.stringify(itemDoc), bppMongoId: bpp._id },
 		})
-		console.log(itemDoc)
 		await itemAttendanceQueries.create({
 			userMongoId: userId,
 			itemMongoId: item._id,
@@ -95,7 +92,6 @@ exports.onConfirm = async (req, res) => {
 		flattenedFulfillment[0].orderId = orderId
 		await cacheSave(`FULFILLMENT:${transactionId}`, flattenedFulfillment[0])
 		await sendMessage(`CONFIRM:${transactionId}`, `CONFIRM:${transactionId}`)
-		console.log(flattenedFulfillment[0])
 		res.status(200).json({
 			status: true,
 			message: 'On_Select Success',

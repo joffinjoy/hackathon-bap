@@ -16,6 +16,5 @@ exports.contextBuilder = async (transactionId, messageId, action, bppId, bppUri)
 	}
 
 	const filteredContext = Object.fromEntries(Object.entries(context).filter((entry) => entry[1] !== undefined))
-	console.log(filteredContext)
 	return filteredContext
 }

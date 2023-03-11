@@ -25,8 +25,6 @@ exports.init = async (req, res) => {
 
 		const userProfile = await profileQueries.findByUserId(userId)
 		const user = await userQueries.findById(userId)
-		console.log(user)
-		console.log(userProfile)
 
 		const message = initMessageDTO({
 			itemId,
@@ -75,7 +73,6 @@ exports.onInit = async (req, res) => {
 		const transactionId = context.transaction_id
 		const bppMongoId = bpp._id
 		const providers = [req.body.message.order.provider]
-		console.log(JSON.stringify(providers, null, 4))
 		const isCatalogHandled = await catalogService.catalogHandler(providers, transactionId, bppMongoId)
 		if (isCatalogHandled) await sendMessage(`INIT:${transactionId}`, `INIT:${transactionId}`)
 		else await sendMessage(`INIT:${transactionId}`, 'false')

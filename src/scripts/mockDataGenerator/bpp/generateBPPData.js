@@ -15,8 +15,6 @@ const generateMentorNames = () => {
 			i++
 			mentorSet.add(faker.name.fullName())
 		} while (mentorSet.size !== count)
-		//console.log(Array.from(mentorSet))
-		//console.log('i: ', i)
 		return Array.from(mentorSet)
 	} catch (err) {
 		console.log(err)
@@ -36,8 +34,6 @@ const generateCategoryNames = () => {
 			const second = faker.helpers.arrayElement(secondOptions)
 			categorySet.add(`${first} ${second}`)
 		} while (categorySet.size !== count)
-		/* console.log(Array.from(categorySet))
-		console.log('i: ', i) */
 		return Array.from(categorySet)
 	} catch (err) {
 		console.log(err)
@@ -74,8 +70,6 @@ const generateOrganizationNames = () => {
 			i++
 			organizationSet.add(faker.helpers.arrayElement(options))
 		} while (organizationSet.size !== count)
-		/* console.log(Array.from(organizationSet))
-		console.log('i: ', i) */
 		return Array.from(organizationSet)
 	} catch (err) {
 		console.log(err)
@@ -111,29 +105,6 @@ const generateBPPData = async () => {
 		let mentor = null
 
 		for (let i = 1; i <= 200; i++) {
-			console.log('i: ', i)
-			/* console.log('I: ', i)
-			console.log('ORGANIZATION INDEX VALUE: ', organizationNameIndex)
-			console.log()
-			console.log('ORGANIZATION: ', {
-				name: organizations[organizationNameIndex],
-				code: crypto.randomUUID().replace(/-/g, ''),
-				description: organizations[organizationNameIndex] + 'Description',
-			})
-
-			console.log('MENTOR INDEX VALUE: ', mentorNameIndex)
-			console.log('MENTOR: ', {
-				name: mentorName[mentorNameIndex].replace(/[^a-zA-Z\s ]+/g, ''),
-				email:
-					mentorName[mentorNameIndex].toLowerCase().replace(/[^a-zA-Z]+/g, '') +
-					`@${organizations[organizationNameIndex].toLowerCase()}.com`,
-				password: 'hackathonpassword',
-				isAMentor: true,
-				secretCode: '4567',
-				otp: '319044',
-				//organisationId: organisation.id,
-			}) */
-
 			let category = {
 				value: categoryNames[categoryNameIndex],
 				label: categoryNames[categoryNameIndex],
@@ -191,8 +162,6 @@ const generateBPPData = async () => {
 
 			if (i % 20 === 0) {
 				++categoryNameIndex
-				console.log('CATEGORY: ', category)
-				console.log('ORGANIZATION INDEX VALUE: ', categoryNameIndex)
 				category = {
 					value: categoryNames[categoryNameIndex],
 					label: categoryNames[categoryNameIndex],
@@ -226,28 +195,6 @@ const generateBPPData = async () => {
 			++timeSlotIndex
 			await sleep(100)
 		}
-		/* console.log('TIME SLOT INDEX: ', timeSlotIndex)
-			console.log({
-				title: `${sessionTitles[i - 1]} Cluster${clusterNumber}`,
-				description: `${sessionTitles[i - 1]} Cluster${clusterNumber}`,
-				startDate: timeSlots[timeSlotIndex].startDate,
-				endDate: timeSlots[timeSlotIndex].endDate,
-				recommendedFor: [
-					{
-						value: 'deo',
-						label: 'District education officer',
-					},
-				],
-				categories: [category],
-				medium: [
-					{
-						label: 'English',
-						value: '1',
-					},
-				],
-				timeZone: 'Asia/Calcutta',
-				image: ['users/1232s2133sdd1-12e2dasd3123.png'],
-			}) */
 	} catch (err) {
 		console.log(err)
 	}

@@ -36,7 +36,6 @@ const findByEmail = async (email) => {
 const deleteOne = async (user) => {
 	try {
 		await User.deleteOne({ _id: user._id })
-		console.log('User Deleted')
 	} catch (err) {
 		console.log(err)
 		throw err

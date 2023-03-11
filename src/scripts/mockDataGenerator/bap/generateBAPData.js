@@ -35,7 +35,6 @@ function sleep(ms) {
 const generateBAPData = async () => {
 	try {
 		for (let i = 1; i <= 10; i++) {
-			console.log('I: ', i)
 			const sessions = await getSessions({
 				sessionTitle: 'ClusterNumber' + i,
 				type: 'session',
@@ -71,7 +70,6 @@ const generateBAPData = async () => {
 						orderId,
 						rating: getRandomNumber(1, 5),
 					})
-					console.log(completed)
 				}
 			}
 		}
