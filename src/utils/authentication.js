@@ -48,9 +48,7 @@ exports.generateJWTs = async (user) => {
 			expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
 			algorithm: 'RS256',
 		})
-		return {
-			accessToken,
-		}
+		return { accessToken }
 	} catch (err) {
 		console.log(err)
 	}

@@ -12,7 +12,7 @@ const config = {
 exports.markCompleted = async (authToken, data) => {
 	try {
 		config.headers['Authorization'] = 'Bearer ' + authToken
-		config.url = 'http://localhost:3015/osl-bap/mark-attendance-completed'
+		config.url = 'http://localhost:3015/osl-bap/consumer/mark-attendance-completed'
 		config.data = JSON.stringify(data)
 		const response = await axios(config)
 		return response.data.data

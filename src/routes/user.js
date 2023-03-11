@@ -9,6 +9,6 @@ router.post('/get-user-emails', userController.getUserEmails)
 
 router.use(tokenVerifier)
 router.post('/profile/add', userController.addProfile)
-//router.post('/profile/edit', userController.editProfile)
+router.post('/profile/edit', userController.editProfile)
 
 module.exports = router
