@@ -45,6 +45,7 @@ const generateBAPData = async () => {
 			const userNames = await generateUserNames(userCountForCluster)
 
 			for (let j = 0; j < userCountForCluster; j++) {
+				console.log('J: ', j)
 				const enrollmentCountForThisUser = 5 //getRandomNumber(5, 10)
 				const user = await signup({
 					email: userNames[j].toLowerCase().replace(/[^a-zA-Z]+/g, '') + i + '@shikshalokam.org',

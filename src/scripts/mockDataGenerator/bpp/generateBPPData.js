@@ -25,7 +25,7 @@ const generateCategoryNames = () => {
 	try {
 		const firstOptions = ['Academic', 'Educational', 'Co-curricular', 'Administrative', 'Financial']
 		const secondOptions = ['Leadership', 'Improvement', 'Activities', 'Management']
-		const count = 12
+		const count = 20
 		const categorySet = new Set()
 		let i = 0
 		do {
@@ -80,6 +80,29 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+const timeSlots = [
+	{
+		startDate: 1677641400, //9:00 AM IST March 1st
+		endDate: 1677645000, //10:00 AM IST March 1st
+	},
+	{
+		startDate: 1677645000, //10:00 AM IST March 1st
+		endDate: 1677648600, //11:00 AM IST March 1st
+	},
+	{
+		startDate: 1677753000, //4:00 PM IST March 2nd
+		endDate: 1677756600, //5:00 PM IST March 2nd
+	},
+	{
+		startDate: 1677756600, //5:00 PM IST March 2nd
+		endDate: 1677760200, //6:00 PM IST March 2nd
+	},
+	{
+		startDate: 1677832200, //2:00 PM IST March 3rd
+		endDate: 1677835800, //3:00 PM IST March 3rd
+	},
+]
+
 const generateBPPData = async () => {
 	try {
 		const initialMentorAccount = await loginMentorAccount({
@@ -91,27 +114,19 @@ const generateBPPData = async () => {
 		const categoryNames = generateCategoryNames()
 		const organizations = generateOrganizationNames()
 
-		let clusterNumber = 1
-		let organizationNameIndex = 0
-		let mentorNameIndex = 0
-		let categoryNameIndex = 0
-		let timeSlotIndex = 0
-		let organisation = await generateOrganization(initialAccessToken, {
-			name: organizations[organizationNameIndex],
-			code: crypto.randomUUID().replace(/-/g, ''),
-			description: organizations[organizationNameIndex] + 'Description',
-		})
-		++organizationNameIndex
+		let clusterNumber = 0
+		let organizationNameIndex = -1
+		let mentorNameIndex = -1
+		let categoryNameIndex = -1
+		let timeSlotIndex = -1
 		let mentor = null
+		let access_token = initialAccessToken
 
-		for (let i = 1; i <= 200; i++) {
-			let category = {
-				value: categoryNames[categoryNameIndex],
-				label: categoryNames[categoryNameIndex],
-			}
-
-			let access_token = mentor ? mentor.access_token : initialAccessToken
-			if (i % 25 === 0) {
+		let category
+		let organisation
+		for (let i = 0; i < 200; i++) {
+			console.log('i: ', i)
+			if (i % 20 === 0) {
 				++organizationNameIndex
 				organisation = await generateOrganization(access_token, {
 					name: organizations[organizationNameIndex],
@@ -119,30 +134,6 @@ const generateBPPData = async () => {
 					description: organizations[organizationNameIndex] + 'Description',
 				})
 			}
-
-			const timeSlots = [
-				{
-					startDate: 1677641400, //9:00 AM IST March 1st
-					endDate: 1677645000, //10:00 AM IST March 1st
-				},
-				{
-					startDate: 1677645000, //10:00 AM IST March 1st
-					endDate: 1677648600, //11:00 AM IST March 1st
-				},
-				{
-					startDate: 1677753000, //4:00 PM IST March 2nd
-					endDate: 1677756600, //5:00 PM IST March 2nd
-				},
-				{
-					startDate: 1677756600, //5:00 PM IST March 2nd
-					endDate: 1677760200, //6:00 PM IST March 2nd
-				},
-				{
-					startDate: 1677832200, //2:00 PM IST March 3rd
-					endDate: 1677835800, //3:00 PM IST March 3rd
-				},
-			]
-
 			if (i % 5 === 0) {
 				timeSlotIndex = 0
 				++mentorNameIndex
@@ -159,7 +150,6 @@ const generateBPPData = async () => {
 				})
 				access_token = mentor.access_token
 			}
-
 			if (i % 20 === 0) {
 				++categoryNameIndex
 				category = {
@@ -167,13 +157,11 @@ const generateBPPData = async () => {
 					label: categoryNames[categoryNameIndex],
 				}
 			}
-			if (i % 20 === 0) {
-				++clusterNumber
-			}
+			if (i % 20 === 0) ++clusterNumber
 
-			const session = await generateSession(access_token, {
-				title: `${sessionTitles[i - 1]} ClusterNumber${clusterNumber}`,
-				description: `${sessionTitles[i - 1]} ClusterNumber${clusterNumber}`,
+			await generateSession(access_token, {
+				title: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
+				description: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
 				startDate: timeSlots[timeSlotIndex].startDate,
 				endDate: timeSlots[timeSlotIndex].endDate,
 				recommendedFor: [
@@ -193,7 +181,7 @@ const generateBPPData = async () => {
 				image: ['users/1232s2133sdd1-12e2dasd3123.png'],
 			})
 			++timeSlotIndex
-			await sleep(100)
+			//await sleep(100)
 		}
 	} catch (err) {
 		console.log(err)
