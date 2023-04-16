@@ -23,9 +23,25 @@ const generateMentorNames = () => {
 
 const generateCategoryNames = () => {
 	try {
-		const firstOptions = ['Academic', 'Educational', 'Co-curricular', 'Administrative', 'Financial']
-		const secondOptions = ['Leadership', 'Improvement', 'Activities', 'Management']
-		const count = 20
+		const firstOptions = [
+			'Academic',
+			'Educational',
+			'Co-curricular',
+			'Administrative',
+			'Financial',
+			'Office',
+			'Infrastructure',
+		]
+		const secondOptions = [
+			'Leadership',
+			'Improvement',
+			'Activities',
+			'Management',
+			'Training',
+			'Analysis',
+			'Research',
+		]
+		const count = 40
 		const categorySet = new Set()
 		let i = 0
 		do {
@@ -150,7 +166,7 @@ const generateBPPData = async () => {
 				})
 				access_token = mentor.access_token
 			}
-			if (i % 20 === 0) {
+			if (i % 5 === 0) {
 				++categoryNameIndex
 				category = {
 					value: categoryNames[categoryNameIndex],
