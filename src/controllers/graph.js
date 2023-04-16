@@ -14,6 +14,18 @@ const recomputeRecommendations = async (req, res) => {
 	}
 }
 
+const recomputeContentRecommendations = async (req, res) => {
+	try {
+		const response = await internalRequests.recommendationPOST({
+			route: process.env.RECOMMENDATION_TRIGGER_CONTENT_RECOMPUTATION,
+		})
+		if (response.status) responses.success(res, 'Recommendations Recomputed Successfully')
+		else responses.failBad(res, 'Recommendations Recomputation Failed')
+	} catch (err) {
+		console.log(err)
+	}
+}
+
 const setUniqueConstraints = async (req, res) => {
 	try {
 		const response = await internalRequests.recommendationPOST({
@@ -29,6 +41,7 @@ const setUniqueConstraints = async (req, res) => {
 const graphController = {
 	recomputeRecommendations,
 	setUniqueConstraints,
+	recomputeContentRecommendations,
 }
 
 module.exports = graphController
