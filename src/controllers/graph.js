@@ -26,6 +26,18 @@ const recomputeContentRecommendations = async (req, res) => {
 	}
 }
 
+const recomputePageRank = async (req, res) => {
+	try {
+		const response = await internalRequests.recommendationPOST({
+			route: process.env.RECOMMENDATION_PAGERANK_RECOMPUTATION,
+		})
+		if (response.status) responses.success(res, 'Recommendations Recomputed Successfully')
+		else responses.failBad(res, 'Recommendations Recomputation Failed')
+	} catch (err) {
+		console.log(err)
+	}
+}
+
 const setUniqueConstraints = async (req, res) => {
 	try {
 		const response = await internalRequests.recommendationPOST({
@@ -42,6 +54,7 @@ const graphController = {
 	recomputeRecommendations,
 	setUniqueConstraints,
 	recomputeContentRecommendations,
+	recomputePageRank,
 }
 
 module.exports = graphController
