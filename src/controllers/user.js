@@ -22,6 +22,7 @@ const login = async (req, res) => {
 		responses.success(res, 'Login Successful', {
 			email: user.email,
 			accessToken: jwtTokens.accessToken,
+			userId: user._id,
 			expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
 		})
 	} catch (err) {
