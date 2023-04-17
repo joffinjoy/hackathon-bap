@@ -47,3 +47,8 @@ exports.externalPOSTRequest = () => {
 exports.internalPOSTRequest = (baseURL) => {
 	return async ({ headers, body, route }) => await exports.postRequest(baseURL, route, headers, body)
 }
+
+exports.internalGETRequest = (baseURL) => {
+	return async ({ headers, pathParams, queryParams, route }) =>
+		await exports.getRequest(baseURL, route, headers, pathParams, queryParams)
+}

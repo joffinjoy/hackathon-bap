@@ -50,11 +50,41 @@ const setUniqueConstraints = async (req, res) => {
 	}
 }
 
+const triggerAutoSearch = async (req, res) => {
+	try {
+		const command = req.query.command
+		const response = await internalRequests.recommendationGET({
+			queryParams: {
+				command,
+			},
+			route: process.env.RECOMMENDATION_TRIGGER_AUTO_SEARCH,
+		})
+		if (response.status) responses.success(res, 'Auto Search Trigger Successful')
+		else responses.failBad(res, 'Something Went Wrong')
+	} catch (err) {
+		console.log(err)
+	}
+}
+
+const deleteAllNodes = async (req, res) => {
+	try {
+		const response = await internalRequests.recommendationGET({
+			route: process.env.RECOMMENDATION_DELETE_ALL_NODES,
+		})
+		if (response.status) responses.success(res, 'All Nodes Deleted')
+		else responses.failBad(res, 'Something Went Wrong')
+	} catch (err) {
+		console.log(err)
+	}
+}
+
 const graphController = {
 	recomputeRecommendations,
 	setUniqueConstraints,
 	recomputeContentRecommendations,
 	recomputePageRank,
+	triggerAutoSearch,
+	deleteAllNodes,
 }
 
 module.exports = graphController
