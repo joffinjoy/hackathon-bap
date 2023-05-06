@@ -2,10 +2,10 @@
 const { internalRequests } = require('@helpers/requests')
 const { responses } = require('@helpers/responses')
 
-const recomputeRecommendations = async (req, res) => {
+const recomputeCollaborativeRecommendations = async (req, res) => {
 	try {
 		const response = await internalRequests.recommendationPOST({
-			route: process.env.RECOMMENDATION_TRIGGER_RECOMPUTATION,
+			route: process.env.RECOMMENDATION_TRIGGER_COLLABORATIVE_RECOMPUTATION,
 		})
 		if (response.status) responses.success(res, 'Recommendations Recomputed Successfully')
 		else responses.failBad(res, 'Recommendations Recomputation Failed')
@@ -79,7 +79,7 @@ const deleteAllNodes = async (req, res) => {
 }
 
 const graphController = {
-	recomputeRecommendations,
+	recomputeCollaborativeRecommendations,
 	setUniqueConstraints,
 	recomputeContentRecommendations,
 	recomputePageRank,

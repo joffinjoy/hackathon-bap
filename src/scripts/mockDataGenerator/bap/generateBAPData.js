@@ -44,6 +44,47 @@ const generateBAPData = async () => {
 			const userCountForCluster = 15 //getRandomNumber(15, 30)
 			const userNames = await generateUserNames(userCountForCluster)
 
+			/* await Promise.all(
+				userNames.slice(0, userCountForCluster).map(async (userName) => {
+					console.log('USER LOOP')
+					const user = await signup({
+						email: userName.toLowerCase().replace(/[^a-zA-Z]+/g, '') + i + '@shikshalokam.org',
+						password: 'password',
+					})
+					const accessToken = user.accessToken
+					await addProfile(accessToken, {
+						name: userName,
+						phone: '9895000000',
+					})
+					const shuffledSessions = await shuffleArray(sessions)
+					const enrollmentCountForThisUser = 7
+					await Promise.all(
+						shuffledSessions.slice(0, enrollmentCountForThisUser).map(async (session, idx) => {
+							console.log('SESSION LOOP', idx)
+							const itemId = session.item.id
+							const fulfillmentId = session.fulfillment.id
+							const confirm = await confirmSession(accessToken, {
+								itemId,
+								fulfillmentId,
+								type: 'session',
+							})
+							try {
+								const orderId = confirm.fulfillment.orderId
+								await markCompleted(accessToken, {
+									orderId,
+									rating: getRandomNumber(1, 5),
+								})
+							} catch (err) {
+								console.log(err)
+							}
+							return true
+						})
+					)
+					return true
+				})
+			) */
+			//await sleep(1000)
+
 			for (let j = 0; j < userCountForCluster; j++) {
 				console.log('\tJ: ', j)
 				const enrollmentCountForThisUser = 7 //getRandomNumber(5, 10)
@@ -67,12 +108,16 @@ const generateBAPData = async () => {
 						fulfillmentId,
 						type: 'session',
 					})
-					await sleep(1000)
-					const orderId = confirm.fulfillment.orderId
-					const completed = await markCompleted(accessToken, {
-						orderId,
-						rating: getRandomNumber(1, 5),
-					})
+					await sleep(100)
+					try {
+						const orderId = confirm.fulfillment.orderId
+						await markCompleted(accessToken, {
+							orderId,
+							rating: getRandomNumber(1, 5),
+						})
+					} catch (err) {
+						console.log(err)
+					}
 				}
 			}
 		}

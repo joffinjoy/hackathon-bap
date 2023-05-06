@@ -51,7 +51,8 @@ exports.confirm = async (req, res) => {
 				return false
 			}),
 		])
-		if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong')
+		console.log('REDIS MESSAGE: ', redisMessage)
+		if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong:REDIS')
 		const fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
 		res.status(200).json({
 			status: true,

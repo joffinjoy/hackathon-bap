@@ -14,6 +14,7 @@ exports.getSessions = async (data) => {
 		config.url = 'http://localhost:3015/osl-bap/dsep/search'
 		config.data = JSON.stringify(data)
 		const response = await axios(config)
+		//console.log(response.data.data.sessions)
 		return response.data.data.sessions
 	} catch (err) {
 		console.log(err)
