@@ -12,64 +12,70 @@ const { catalogService } = require('@services/catalog')
 const { wait } = require('@utils/wait')
 const { itemQueries } = require('@database/storage/item/queries')
 const { itemAttendanceQueries } = require('@database/storage/itemAttendance/queries')
+const sampleResponses = require('../../sampleResponses/karmayogi')
 
 exports.confirm = async (req, res) => {
 	const failedRes = (message) => res.status(400).json({ status: false, message })
 	try {
-		const transactionId = crypto.randomUUID()
-		const messageId = crypto.randomUUID()
-		const itemId = req.body.itemId
-		const fulfillmentId = req.body.fulfillmentId
-		const userId = req.user.id
-		const type = req.body.type
-		const context = await contextBuilder(transactionId, messageId, process.env.CONFIRM_ACTION)
-		if (!itemId || !fulfillmentId) return failedRes('Either itemId Or fulfillmentId id is missing')
-
-		const userProfile = await profileQueries.findByUserId(userId)
-		const user = await userQueries.findById(userId)
-
-		const message = confirmMessageDTO({
-			itemId,
-			fulfillmentId,
-			name: userProfile.name,
-			phone: userProfile.phone,
-			email: user.email,
-		})
-
-		const initRequestBody = requestBodyDTO(context, message)
-		const bppMongoId = await cacheGet(`SESSION:BPP_ID:${itemId}`)
-		const bpp = await bppQueries.findById(bppMongoId)
-		if (!bpp) failedRes('Bpp Not Found')
-		await externalRequests.dsepPOST({
-			baseURL: bpp.bppUri,
-			body: initRequestBody,
-			route: process.env.CONFIRM_ROUTE,
-		})
-		const redisMessage = await Promise.race([
-			getMessage(`CONFIRM:${transactionId}`),
-			wait(process.env.CALLBACK_MAXIMUM_WAIT_TIME).then(() => {
-				return false
-			}),
-		])
-		if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong')
-		const fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
 		res.status(200).json({
 			status: true,
 			message: 'Confirm Success',
-			data: { fulfillment },
+			data: sampleResponses.confirm_api_response,
 		})
-		const itemDoc = await cacheGet(`SESSION:${itemId}`)
-		const { item } = await itemQueries.findOrCreate({
-			where: { itemId },
-			defaults: { details: JSON.stringify(itemDoc), bppMongoId: bpp._id },
-		})
-		await itemAttendanceQueries.create({
-			userMongoId: userId,
-			itemMongoId: item._id,
-			orderId: fulfillment.orderId,
-			joinLink: fulfillment.joinLink,
-			type: type === 'mentor' ? 'mentor' : 'session',
-		})
+		// const transactionId = crypto.randomUUID()
+		// const messageId = crypto.randomUUID()
+		// const itemId = req.body.itemId
+		// const fulfillmentId = req.body.fulfillmentId
+		// const userId = req.user.id
+		// const type = req.body.type
+		// const context = await contextBuilder(transactionId, messageId, process.env.CONFIRM_ACTION)
+		// if (!itemId || !fulfillmentId) return failedRes('Either itemId Or fulfillmentId id is missing')
+
+		// const userProfile = await profileQueries.findByUserId(userId)
+		// const user = await userQueries.findById(userId)
+
+		// const message = confirmMessageDTO({
+		// 	itemId,
+		// 	fulfillmentId,
+		// 	name: userProfile.name,
+		// 	phone: userProfile.phone,
+		// 	email: user.email,
+		// })
+
+		// const initRequestBody = requestBodyDTO(context, message)
+		// const bppMongoId = await cacheGet(`SESSION:BPP_ID:${itemId}`)
+		// const bpp = await bppQueries.findById(bppMongoId)
+		// if (!bpp) failedRes('Bpp Not Found')
+		// await externalRequests.dsepPOST({
+		// 	baseURL: bpp.bppUri,
+		// 	body: initRequestBody,
+		// 	route: process.env.CONFIRM_ROUTE,
+		// })
+		// const redisMessage = await Promise.race([
+		// 	getMessage(`CONFIRM:${transactionId}`),
+		// 	wait(process.env.CALLBACK_MAXIMUM_WAIT_TIME).then(() => {
+		// 		return false
+		// 	}),
+		// ])
+		// if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong')
+		// const fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
+		// res.status(200).json({
+		// 	status: true,
+		// 	message: 'Confirm Success',
+		// 	data: { fulfillment },
+		// })
+		// const itemDoc = await cacheGet(`SESSION:${itemId}`)
+		// const { item } = await itemQueries.findOrCreate({
+		// 	where: { itemId },
+		// 	defaults: { details: JSON.stringify(itemDoc), bppMongoId: bpp._id },
+		// })
+		// await itemAttendanceQueries.create({
+		// 	userMongoId: userId,
+		// 	itemMongoId: item._id,
+		// 	orderId: fulfillment.orderId,
+		// 	joinLink: fulfillment.joinLink,
+		// 	type: type === 'mentor' ? 'mentor' : 'session',
+		// })
 	} catch (err) {
 		console.log(err)
 	}
