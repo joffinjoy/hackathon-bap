@@ -160,24 +160,24 @@ function sleep(ms) {
 
 const timeSlots = [
 	{
-		startDate: 1677641400, //9:00 AM IST March 1st
-		endDate: 1677645000, //10:00 AM IST March 1st
+		startDate: 1694403000, //9:00 AM IST March 1st
+		endDate: 1694406600, //10:00 AM IST March 1st
 	},
 	{
-		startDate: 1677645000, //10:00 AM IST March 1st
-		endDate: 1677648600, //11:00 AM IST March 1st
+		startDate: 1694406600, //10:00 AM IST March 1st
+		endDate: 1694410200, //11:00 AM IST March 1st
 	},
 	{
-		startDate: 1677753000, //4:00 PM IST March 2nd
-		endDate: 1677756600, //5:00 PM IST March 2nd
+		startDate: 1694514600, //4:00 PM IST March 2nd
+		endDate: 1694518200, //5:00 PM IST March 2nd
 	},
 	{
-		startDate: 1677756600, //5:00 PM IST March 2nd
-		endDate: 1677760200, //6:00 PM IST March 2nd
+		startDate: 1694518200, //5:00 PM IST March 2nd
+		endDate: 1694521800, //6:00 PM IST March 2nd
 	},
 	{
-		startDate: 1677832200, //2:00 PM IST March 3rd
-		endDate: 1677835800, //3:00 PM IST March 3rd
+		startDate: 1694593800, //2:00 PM IST March 3rd
+		endDate: 1694597400, //3:00 PM IST March 3rd
 	},
 ]
 
