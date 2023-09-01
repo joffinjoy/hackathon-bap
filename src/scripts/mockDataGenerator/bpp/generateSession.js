@@ -4,7 +4,7 @@ const axios = require('axios')
 const config = {
 	method: 'post',
 	maxBodyLength: Infinity,
-	url: 'https://dev.elevate-apis.shikshalokam.org/dsep-mentoring/v1/sessions/update',
+	url: 'https://dev.elevate-apis.shikshalokam.org/karmayogi-mentoring/v1/sessions/update',
 	headers: {
 		'Content-Type': 'application/json',
 	},

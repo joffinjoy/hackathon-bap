@@ -8,14 +8,96 @@ const crypto = require('crypto')
 
 const generateMentorNames = () => {
 	try {
-		const count = 42
+		/* const count = 42
 		const mentorSet = new Set()
 		let i = 0
 		do {
 			i++
 			mentorSet.add(faker.name.fullName())
 		} while (mentorSet.size !== count)
-		return Array.from(mentorSet)
+		return Array.from(mentorSet) */
+		return [
+			'Academic Commons',
+			'Ethics Library',
+			'Philosophy Forum',
+			'Economics Lecture Hall',
+			'Academic Excellence Center',
+			'Leadership Institute',
+			'Career Development Center',
+			'Alumni Lounge',
+			'Graduation Auditorium',
+			'Thesis Presentation Room',
+			'Quiet Study Zone',
+			'Grad Student Hub',
+			'Exam Proctoring Center',
+			'Peer Tutoring Lab',
+			'History Archive',
+			'Math Society Room',
+			'Science Discovery Lab',
+			'Writing Support Center',
+			'Art Studio Workshop',
+			'Music Recital Hall',
+			'Drama Performance Stage',
+			'Biology Ecology Lab',
+			'Chemistry Materials Lab',
+			'Astronomy Galaxy Room',
+			'Theater Costume Studio',
+			'Psychology Research Lab',
+			'Sociology Discussion Room',
+			'Debate Practice Hall',
+			'Robotics Development Lab',
+			'Research Collaboration Space',
+			'Innovation Hub',
+			'Ethics Roundtable',
+			'Philosophy Seminar Space',
+			'Economics Policy Center',
+			'Academic Advising Lounge',
+			'Leadership Training Room',
+			'Career Coaching Office',
+			'Alumni Networking Lounge',
+			'Graduation Ceremony Hall',
+			'Thesis Review Chamber',
+			'Silent Study Zone',
+			'Grad Student Hangout',
+			'Exam Assistance Room',
+			'Peer Tutoring Hub',
+			'History Research Archive',
+			'Math Problem-Solving Room',
+			'Science Exploration Hub',
+			'Writing Assistance Center',
+			'Art Studio Gallery',
+			'Music Practice Studio',
+			'Drama Rehearsal Space',
+			'Biology Lab Discovery',
+			'Chemistry Lab Innovations',
+			'Astronomy Observation Room',
+			'Theater Design Studio',
+			'Psychology Counseling Suite',
+			'Sociology Research Lounge',
+			'Debate Club Meeting Room',
+			'Robotics Workshop',
+			'Research Collaboration Hub',
+			'Innovation Workshop',
+			'Ethics Lecture Hall',
+			'Philosophy Discussion Room',
+			'Economics Research Space',
+			'Academic Success Room',
+			'Leadership Development Space',
+			'Career Advancement Center',
+			'Alumni Engagement Space',
+			'Graduation Planning Office',
+			'Thesis Presentation Chamber',
+			'Silent Study Retreat',
+			'Grad Student Collaboration Space',
+			'Exam Preparation Zone',
+			'Peer Tutoring Lounge',
+			'History Symposium Room',
+			'Math Society Meeting Space',
+			'Science Lab Inquiry',
+			'Writing Workshop',
+			'Creative Writing Studio',
+			'Art Studio Gallery',
+		]
 	} catch (err) {
 		console.log(err)
 	}
@@ -58,28 +140,8 @@ const generateCategoryNames = () => {
 
 const generateOrganizationNames = () => {
 	try {
-		const options = [
-			'MentorMe',
-			'EduCare',
-			'LearnCo',
-			'EducationPlus',
-			'FutureMinds',
-			'MentorLink',
-			'StudentSuccess',
-			'EduMentor',
-			'LearningBridge',
-			'AcademyNow',
-			'MentorMatch',
-			'SmartStart',
-			'EduQuest',
-			'KnowledgeCore',
-			'MentorMindset',
-			'TeachForward',
-			'EduPilot',
-			'MentorNet',
-			'InspireU',
-		]
-		const count = 10
+		const options = ['Drishti', 'Aakash', 'FIITJEE', 'Allen', 'Taj', 'NITC', 'IITB', 'EduMentor']
+		const count = 8
 		const organizationSet = new Set()
 		let i = 0
 		do {
@@ -126,38 +188,39 @@ const generateBPPData = async () => {
 			password: 'testing',
 		})
 		const initialAccessToken = initialMentorAccount.access_token
-		const mentorName = generateMentorNames()
-		const categoryNames = generateCategoryNames()
-		const organizations = generateOrganizationNames()
+		const mentorNames = generateMentorNames() // Assuming generateMentorNames() returns an array of mentor names
+		const categoryNames = generateCategoryNames() // Assuming generateCategoryNames() returns an array of category names
+		const organizations = generateOrganizationNames() // Assuming generateOrganizationNames() returns an array of organization names
 
-		let clusterNumber = 0
-		let organizationNameIndex = -1
-		let mentorNameIndex = -1
-		let categoryNameIndex = -1
-		let timeSlotIndex = -1
-		let mentor = null
+		let organizationNameIndex = 0
+		let mentorNameIndex = 0
+		let categoryNameIndex = 0
+		let timeSlotIndex = 0
 		let access_token = initialAccessToken
+		let mentor = null
 
 		let category
 		let organisation
-		for (let i = 0; i < 200; i++) {
+		for (let i = 0; i < 400; i++) {
+			// Create 400 sessions
 			console.log('i: ', i)
-			if (i % 20 === 0) {
-				++organizationNameIndex
+			if (i % 50 === 0) {
+				// Create 8 organizations
 				organisation = await generateOrganization(access_token, {
 					name: organizations[organizationNameIndex],
 					code: crypto.randomUUID().replace(/-/g, ''),
 					description: organizations[organizationNameIndex] + 'Description',
 				})
+				++organizationNameIndex
 			}
 			if (i % 5 === 0) {
+				// Create 80 mentors
 				timeSlotIndex = 0
-				++mentorNameIndex
 				mentor = await generateMentorAccount({
-					name: mentorName[mentorNameIndex].replace(/[^a-zA-Z\s ]+/g, ''),
+					name: mentorNames[mentorNameIndex].replace(/[^a-zA-Z\s ]+/g, ''),
 					email:
-						mentorName[mentorNameIndex].toLowerCase().replace(/[^a-zA-Z]+/g, '') +
-						`@${organizations[organizationNameIndex].toLowerCase()}.com`,
+						mentorNames[mentorNameIndex].toLowerCase().replace(/[^a-zA-Z]+/g, '') +
+						`@${organizations[organizationNameIndex - 1].toLowerCase()}.com`,
 					password: 'hackathonpassword',
 					isAMentor: true,
 					secretCode: '4567',
@@ -165,19 +228,20 @@ const generateBPPData = async () => {
 					organisationId: organisation.id,
 				})
 				access_token = mentor.access_token
+				++mentorNameIndex
 			}
-			if (i % 5 === 0) {
-				++categoryNameIndex
+			if (i % 10 === 0) {
+				// Create 40 categories
 				category = {
 					value: categoryNames[categoryNameIndex],
 					label: categoryNames[categoryNameIndex],
 				}
+				++categoryNameIndex
 			}
-			if (i % 20 === 0) ++clusterNumber
 
 			await generateSession(access_token, {
-				title: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
-				description: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
+				title: `Karmayogi Room Slot`,
+				description: `Karmayogi Room Slot`,
 				startDate: timeSlots[timeSlotIndex].startDate,
 				endDate: timeSlots[timeSlotIndex].endDate,
 				recommendedFor: [
@@ -197,7 +261,6 @@ const generateBPPData = async () => {
 				image: ['users/1232s2133sdd1-12e2dasd3123.png'],
 			})
 			++timeSlotIndex
-			//await sleep(100)
 		}
 	} catch (err) {
 		console.log(err)
