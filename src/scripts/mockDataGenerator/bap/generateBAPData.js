@@ -41,11 +41,12 @@ const generateBAPData = async () => {
 				type: 'session',
 			})
 
-			const userCountForCluster = 10 //getRandomNumber(15, 30)
+			const userCountForCluster = 15 //getRandomNumber(15, 30)
 			const userNames = await generateUserNames(userCountForCluster)
 
 			for (let j = 0; j < userCountForCluster; j++) {
-				const enrollmentCountForThisUser = 5 //getRandomNumber(5, 10)
+				console.log('\tJ: ', j)
+				const enrollmentCountForThisUser = 7 //getRandomNumber(5, 10)
 				const user = await signup({
 					email: userNames[j].toLowerCase().replace(/[^a-zA-Z]+/g, '') + i + '@shikshalokam.org',
 					password: 'password',
@@ -57,6 +58,7 @@ const generateBAPData = async () => {
 				})
 				const shuffledSessions = await shuffleArray(sessions)
 				for (let k = 0; k < enrollmentCountForThisUser; k++) {
+					console.log('\t\tK: ', k)
 					const session = shuffledSessions[k]
 					const itemId = session.item.id
 					const fulfillmentId = session.fulfillment.id

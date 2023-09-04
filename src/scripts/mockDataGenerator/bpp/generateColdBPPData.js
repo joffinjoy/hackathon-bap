@@ -3,7 +3,7 @@ const { generateMentorAccount, loginMentorAccount } = require('./generateMentorA
 const { generateOrganization } = require('./generateOrganization')
 const { generateSession } = require('./generateSession')
 const { faker } = require('@faker-js/faker')
-const { sessionTitles } = require('./sessionTitles')
+const { sessionTitles } = require('./coldSessionTitle')
 const crypto = require('crypto')
 
 const generateMentorNames = () => {
@@ -140,7 +140,7 @@ const generateBPPData = async () => {
 
 		let category
 		let organisation
-		for (let i = 0; i < 200; i++) {
+		for (let i = 0; i < 100; i++) {
 			console.log('i: ', i)
 			if (i % 20 === 0) {
 				++organizationNameIndex
@@ -176,8 +176,8 @@ const generateBPPData = async () => {
 			if (i % 20 === 0) ++clusterNumber
 
 			await generateSession(access_token, {
-				title: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
-				description: `${sessionTitles[i]} ClusterNumber${clusterNumber}`,
+				title: `${sessionTitles[i]} ClusterNumber${10 + clusterNumber}`,
+				description: `${sessionTitles[i]} ClusterNumber${10 + clusterNumber}`,
 				startDate: timeSlots[timeSlotIndex].startDate,
 				endDate: timeSlots[timeSlotIndex].endDate,
 				recommendedFor: [

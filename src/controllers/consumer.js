@@ -65,10 +65,38 @@ const getRecommendations = async (req, res) => {
 	}
 }
 
+const getProfilePageRecommendations = async (req, res) => {
+	try {
+		const userId = req.user.id
+		const type = req.body.type
+		const recommendations = await recommendationService.getProfilePageRecommendations({ userId, type })
+		if (!recommendations) return responses.failBad(res, 'Something Went Wrong')
+		responses.success(res, `Recommendations For ${userId}`, recommendations)
+	} catch (err) {
+		console.log(err)
+		responses.failBad(res, 'Something Went Wrong')
+	}
+}
+
+const getItemPageRecommendations = async (req, res) => {
+	try {
+		const itemId = req.body.itemId
+		const type = req.body.type
+		const recommendations = await recommendationService.getItemPageRecommendations({ itemId, type })
+		if (!recommendations) return responses.failBad(res, 'Something Went Wrong')
+		responses.success(res, `Recommendations For ${itemId}`, recommendations)
+	} catch (err) {
+		console.log(err)
+		responses.failBad(res, 'Something Went Wrong')
+	}
+}
+
 const consumerController = {
 	getConfirmedList,
 	markAttendanceCompleted,
 	getRecommendations,
+	getItemPageRecommendations,
+	getProfilePageRecommendations,
 }
 
 module.exports = consumerController
