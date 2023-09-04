@@ -15,6 +15,7 @@ exports.generateMentorAccount = async (data) => {
 		config.url = 'https://dev.elevate-apis.shikshalokam.org/karmayogi-user/v1/account/create'
 		config.headers['Content-Type'] = 'application/json'
 		config.data = JSON.stringify(data)
+		console.log(config.data)
 		const response = await axios(config)
 		return response.data.result
 	} catch (err) {

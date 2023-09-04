@@ -240,8 +240,8 @@ const generateBPPData = async () => {
 			}
 
 			await generateSession(access_token, {
-				title: `Karmayogi Room Slot`,
-				description: `Karmayogi Room Slot`,
+				title: `Karmayogi Room Slot TEST 200`,
+				description: `Karmayogi Room Slot TEST 200`,
 				startDate: timeSlots[timeSlotIndex].startDate,
 				endDate: timeSlots[timeSlotIndex].endDate,
 				recommendedFor: [
