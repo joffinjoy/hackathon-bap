@@ -19,20 +19,25 @@ const fulfillmentsFlattener = (fulfillments) => {
 			id: fulfillment.id,
 			startTime: fulfillment.time.range.start,
 			endTime: fulfillment.time.range.end,
-			language: fulfillment.language,
-			type: fulfillment.type,
-			//status: fulfillment.tags[0].list[0].descriptor.name,
+			// language: fulfillment.language,
+			// type: fulfillment.type,
+			// status: fulfillment.tags[0].list[0].descriptor.name,
 			mentor: {
 				id: fulfillment.agent.person.id,
 				name: fulfillment.agent.person.name,
+				state: fulfillment.agent.person.state,
+				capacity: fulfillment.agent.person.capacity,
+				description: fulfillment.agent.person.description,
+				facilities:  fulfillment.agent.person.facilities,
+				institute:  fulfillment.agent.person.institute
 			},
 		}
 		for (const tag of fulfillment.tags) {
 			flattenedFulfillment[`${tag.descriptor.name}`] = tag.list[0].descriptor.name
 		}
-		if (fulfillment.customer) {
-			flattenedFulfillment.customer = fulfillment.customer
-		}
+		// if (fulfillment.customer) {
+		// 	flattenedFulfillment.customer = fulfillment.customer
+		// }
 		return flattenedFulfillment
 	})
 }
@@ -40,58 +45,78 @@ const fulfillmentsFlattener = (fulfillments) => {
 const catalogHandler = async (providers, transactionId, bppMongoId) => {
 	try {
 		for (const provider of providers) {
-			const categories = categoriesFlattener(provider.categories)
+			// const categories = categoriesFlattener(provider.categories)
 			const fulfillments = fulfillmentsFlattener(provider.fulfillments)
-			const providerInfo = {
-				id: provider.id,
-				code: provider.descriptor.code,
-				name: provider.descriptor.name,
-			}
+			// const providerInfo = {
+			// 	id: provider.id,
+			// 	code: provider.descriptor.code,
+			// 	name: provider.descriptor.name,
+			// }
+
 			for (const item of provider.items) {
 				const itemId = item.id
-				const categoryIds = item.category_ids.map((categoryId) => {
-					return categoryId.replace(/ /g, '-').toLowerCase()
-				})
-				const itemCategories = categories.filter((category) => categoryIds.includes(category.id))
+				// Sample bpp object
+				const bppMeta = {
+					one: { id: 'K-BPP-1', code: 'K-BPP-1' },
+					two: { id: 'K-BPP-2', code: 'K-BPP-2' }
+				};
+				// Randomly select either bpp.one or bpp.two
+				const randomKey = Math.random() < 0.5 ? 'one' : 'two';
+				const bppInfo = bppMeta[randomKey]
+				// const categoryIds = item.category_ids.map((categoryId) => {
+				// 	return categoryId.replace(/ /g, '-').toLowerCase()
+				// })
+				// const itemCategories = categories.filter((category) => categoryIds.includes(category.id))
 				const fulfillmentId = item.fulfillment_ids[0]
-				const sessionImage = item.descriptor.images[0].url
-				const sessionTitle = item.descriptor.name
-				const sessionDescription = item.descriptor.short_desc
-				const sessionPrice = item.price.value
-				const recommendedFor = item.tags[0].list.map((menteeType) => {
-					return menteeType.descriptor
-				})
+				// const sessionImage = item.descriptor.images[0].url
+				// const sessionTitle = item.descriptor.name
+				// const sessionDescription = item.descriptor.short_desc
+				// const sessionPrice = item.price.value
+				// const recommendedFor = item.tags[0].list.map((menteeType) => {
+				// 	return menteeType.descriptor
+				// })
 				const itemFulfillment = fulfillments.find((fulfillment) => fulfillment.id === fulfillmentId)
 				const mentorInfo = {
+					// id: itemFulfillment.mentor.id,
+					// name: itemFulfillment.mentor.name,
+					// name: itemFulfillment.mentor.name,
 					id: itemFulfillment.mentor.id,
 					name: itemFulfillment.mentor.name,
-					aboutMentor: item.tags[1].list[0].descriptor.name,
-					professionalExperience: item.tags[2].list[0].descriptor.name,
-					qualification: item.tags[3].list[0].descriptor.name,
-					experience: item.tags[4].list[0].descriptor.name,
-					totalMeetings: item.tags[5].list[0].descriptor.name,
-					specialistIn: item.tags[6].list[0].descriptor.name,
+					state: itemFulfillment.mentor.state,
+					capacity: itemFulfillment.mentor.capacity,
+					description: itemFulfillment.mentor.description,
+					facilities:  itemFulfillment.mentor.facilities,
+					institute:  itemFulfillment.mentor.institute
+					// aboutMentor: item.tags[1].list[0].descriptor.name,
+					// professionalExperience: item.tags[2].list[0].descriptor.name,
+					// qualification: item.tags[3].list[0].descriptor.name,
+					// experience: item.tags[4].list[0].descriptor.name,
+					// totalMeetings: item.tags[5].list[0].descriptor.name,
+					// specialistIn: item.tags[6].list[0].descriptor.name,
 				}
+
 				delete itemFulfillment.mentor
 				const session = {
 					item: {
 						id: itemId,
-						image: sessionImage,
-						title: sessionTitle,
-						description: sessionDescription,
-						price: sessionPrice,
+						// image: sessionImage,
+						// title: sessionTitle,
+						// description: sessionDescription,
+						// price: sessionPrice,
 					},
-					recommendedFor,
-					categories: itemCategories,
+					// recommendedFor,
+					// categories: itemCategories,
 					mentor: mentorInfo,
-					provider: providerInfo,
+					// provider: providerInfo,
 					fulfillment: itemFulfillment,
+					bpp: bppInfo
 				}
 				if (itemFulfillment.customer) {
 					session.customer = itemFulfillment.customer
 					delete session.fulfillment.customer
 				}
 				await cacheSave(`SESSION:${itemId}`, session)
+				
 				const response = await internalRequests.recommendationPOST({
 					route: process.env.RECOMMENDATION_ADD_ITEM,
 					body: {
