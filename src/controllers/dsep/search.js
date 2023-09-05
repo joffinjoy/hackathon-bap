@@ -86,7 +86,7 @@ exports.onSearch = async (req, res) => {
 		const transactionId = context.transaction_id
 		const bppMongoId = bpp._id
 		const providers = req.body.message.catalog.providers
-		const isCatalogHandled = await catalogService.catalogHandler(providers, transactionId, bppMongoId)
+		const isCatalogHandled = await catalogService.catalogHandler(providers, transactionId, bppMongoId, 'onSearch')
 		res.status(200).json({
 			status: true,
 			message: 'On_Search Success',

@@ -15,6 +15,7 @@ const categoriesFlattener = (categories) => {
 
 const fulfillmentsFlattener = (fulfillments) => {
 	return fulfillments.map((fulfillment) => {
+		const randomImageURL = getRandomImageURL();
 		const flattenedFulfillment = {
 			id: fulfillment.id,
 			startTime: fulfillment.time.range.start,
@@ -29,7 +30,8 @@ const fulfillmentsFlattener = (fulfillments) => {
 				capacity: fulfillment.agent.person.capacity,
 				description: fulfillment.agent.person.description,
 				facilities:  fulfillment.agent.person.facilities,
-				institute:  fulfillment.agent.person.institute
+				institute:  fulfillment.agent.person.institute,
+				image: randomImageURL
 			},
 		}
 		for (const tag of fulfillment.tags) {
@@ -49,7 +51,7 @@ function getRandomImageURL() {
 	return baseUrl + encodeURIComponent(fileName);
 }
   
-const catalogHandler = async (providers, transactionId, bppMongoId) => {
+const catalogHandler = async (providers, transactionId, bppMongoId, requestFrom = "") => {
 	try {
 		for (const provider of providers) {
 			// const categories = categoriesFlattener(provider.categories)
@@ -59,7 +61,6 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 			// 	code: provider.descriptor.code,
 			// 	name: provider.descriptor.name,
 			// }
-			const randomImageURL = getRandomImageURL();
 			for (const item of provider.items) {
 				const itemId = item.id
 				// Sample bpp object
@@ -83,6 +84,13 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 				// 	return menteeType.descriptor
 				// })
 				const itemFulfillment = fulfillments.find((fulfillment) => fulfillment.id === fulfillmentId)
+				if(itemFulfillment && requestFrom === 'onSearch') {
+					const fulfiledList = await cacheGet('FULLFILLMENT_BLACKLIST')
+					// Check if fulfillmentId exists in the fulfiledList array
+					const isBooked = fulfiledList.includes(fulfillmentId);
+					// Set the 'booked' key in the itemFulfillment object
+					itemFulfillment.booked = isBooked;
+				}
 				const mentorInfo = {
 					// id: itemFulfillment.mentor.id,
 					// name: itemFulfillment.mentor.name,
@@ -94,7 +102,7 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 					description: itemFulfillment.mentor.description,
 					facilities:  itemFulfillment.mentor.facilities,
 					institute:  itemFulfillment.mentor.institute,
-					image: randomImageURL
+					image: itemFulfillment.mentor.image
 					// aboutMentor: item.tags[1].list[0].descriptor.name,
 					// professionalExperience: item.tags[2].list[0].descriptor.name,
 					// qualification: item.tags[3].list[0].descriptor.name,
