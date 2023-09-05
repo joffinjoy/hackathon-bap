@@ -49,8 +49,6 @@ function getRandomImageURL() {
 	return baseUrl + encodeURIComponent(fileName);
 }
   
-  
-
 const catalogHandler = async (providers, transactionId, bppMongoId) => {
 	try {
 		for (const provider of providers) {
