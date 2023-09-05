@@ -12,6 +12,7 @@ router.post('/on_init', initController.onInit)
 router.post('/on_confirm', confirmController.onConfirm)
 router.post('/search', searchController.search)
 router.post('/select', selectController.select)
+router.post('/removeList', confirmController.removeList)
 
 router.use(tokenVerifier)
 router.post('/init', initController.init)

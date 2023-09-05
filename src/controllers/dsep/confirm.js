@@ -7,7 +7,7 @@ const { profileQueries } = require('@database/storage/profile/queries')
 const { userQueries } = require('@database/storage/user/queries')
 const { confirmMessageDTO } = require('@dtos/confirmMessage')
 const { bppQueries } = require('@database/storage/bpp/queries')
-const { getMessage, sendMessage, cacheGet, cacheSave } = require('@utils/redis')
+const { getMessage, sendMessage, cacheGet, cacheSave, listDelete } = require('@utils/redis')
 const { catalogService } = require('@services/catalog')
 const { wait } = require('@utils/wait')
 const { itemQueries } = require('@database/storage/item/queries')
@@ -53,10 +53,22 @@ exports.confirm = async (req, res) => {
 		])
 		if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong')
 		const fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
+		let modifiedFulfillment;
+		if (fulfillment && fulfillment.mentor) {
+			// Create a new object with the "room" key
+			modifiedFulfillment = {
+			  ...fulfillment,
+			  room: fulfillment.mentor,
+			};
+			// Remove the "mentor" key from the new object
+			delete modifiedFulfillment.mentor;
+			// Now, "mentor" has been replaced with "room" in the object
+		}
+
 		res.status(200).json({
 			status: true,
 			message: 'Confirm Success',
-			data: { fulfillment },
+			data: { modifiedFulfillment },
 		})
 		const itemDoc = await cacheGet(`SESSION:${itemId}`)
 		const { item } = await itemQueries.findOrCreate({
@@ -66,8 +78,8 @@ exports.confirm = async (req, res) => {
 		await itemAttendanceQueries.create({
 			userMongoId: userId,
 			itemMongoId: item._id,
-			orderId: fulfillment.orderId,
-			joinLink: fulfillment.joinLink,
+			orderId: modifiedFulfillment.orderId,
+			joinLink: modifiedFulfillment.joinLink,
 			type: type === 'mentor' ? 'mentor' : 'session',
 		})
 	} catch (err) {
@@ -77,6 +89,7 @@ exports.confirm = async (req, res) => {
 
 exports.onConfirm = async (req, res) => {
 	try {
+		
 		const context = req.body.context
 		const message = req.body.message
 		const bppUriFromContext = context.bpp_uri
@@ -90,11 +103,32 @@ exports.onConfirm = async (req, res) => {
 		const orderId = message.order.id
 		const flattenedFulfillment = await catalogService.fulfillmentsFlattener(message.order.fulfillments)
 		flattenedFulfillment[0].orderId = orderId
+		await cacheSave('FULLFILLMENT_BLACKLIST', [flattenedFulfillment[0].id])
 		await cacheSave(`FULFILLMENT:${transactionId}`, flattenedFulfillment[0])
 		await sendMessage(`CONFIRM:${transactionId}`, `CONFIRM:${transactionId}`)
 		res.status(200).json({
 			status: true,
 			message: 'On_Select Success',
+			data: {},
+		})
+	} catch (err) {
+		console.log(err)
+	}
+}
+
+exports.removeList = async (req, res) => {
+	const failedRes = (message) => res.status(400).json({ status: false, message })
+	const availableList = ["FULLFILLMENT_BLACKLIST"]
+	try {
+		const listKey = req.body.listName
+		if(!listKey || !(availableList.includes(listKey))) {
+			return failedRes('list name is missing or no list present with given name')
+		}
+		// Delete the list based on user input
+		await listDelete(listKey)
+		res.status(200).json({
+			status: true,
+			message: 'removeList Success',
 			data: {},
 		})
 	} catch (err) {
