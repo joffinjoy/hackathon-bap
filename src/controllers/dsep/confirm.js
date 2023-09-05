@@ -52,23 +52,18 @@ exports.confirm = async (req, res) => {
 			}),
 		])
 		if (redisMessage !== `CONFIRM:${transactionId}`) return failedRes('Something Went Wrong')
-		const fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
-		let modifiedFulfillment;
+		let fulfillment = await cacheGet(`FULFILLMENT:${transactionId}`)
 		if (fulfillment && fulfillment.mentor) {
-			// Create a new object with the "room" key
-			modifiedFulfillment = {
-			  ...fulfillment,
-			  room: fulfillment.mentor,
-			};
-			// Remove the "mentor" key from the new object
-			delete modifiedFulfillment.mentor;
-			// Now, "mentor" has been replaced with "room" in the object
+			// Replace "mentor" with "room" and remove "joinLink" from the object
+			fulfillment.room = fulfillment.mentor;
+			delete fulfillment.mentor;
+			delete fulfillment.joinLink;
 		}
-
+		
 		res.status(200).json({
 			status: true,
 			message: 'Confirm Success',
-			data: { modifiedFulfillment },
+			data: { fulfillment },
 		})
 		const itemDoc = await cacheGet(`SESSION:${itemId}`)
 		const { item } = await itemQueries.findOrCreate({
@@ -78,8 +73,8 @@ exports.confirm = async (req, res) => {
 		await itemAttendanceQueries.create({
 			userMongoId: userId,
 			itemMongoId: item._id,
-			orderId: modifiedFulfillment.orderId,
-			joinLink: modifiedFulfillment.joinLink,
+			orderId: fulfillment.orderId,
+			// joinLink: fulfillment.joinLink,
 			type: type === 'mentor' ? 'mentor' : 'session',
 		})
 	} catch (err) {
