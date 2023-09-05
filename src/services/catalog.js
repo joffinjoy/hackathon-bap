@@ -42,6 +42,15 @@ const fulfillmentsFlattener = (fulfillments) => {
 	})
 }
 
+function getRandomImageURL() {
+	const baseUrl = 'https://raw.githubusercontent.com/VISHNUDAS-tunerlabs/karmayogi-room-images/master/rooms/';
+	const randomNumber = Math.floor(Math.random() * 91) + 1; // Generates a random number between 1 and 91
+	const fileName = `File ${randomNumber}.png`;
+	return baseUrl + encodeURIComponent(fileName);
+}
+  
+  
+
 const catalogHandler = async (providers, transactionId, bppMongoId) => {
 	try {
 		for (const provider of providers) {
@@ -52,7 +61,7 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 			// 	code: provider.descriptor.code,
 			// 	name: provider.descriptor.name,
 			// }
-
+			const randomImageURL = getRandomImageURL();
 			for (const item of provider.items) {
 				const itemId = item.id
 				// Sample bpp object
@@ -86,7 +95,8 @@ const catalogHandler = async (providers, transactionId, bppMongoId) => {
 					capacity: itemFulfillment.mentor.capacity,
 					description: itemFulfillment.mentor.description,
 					facilities:  itemFulfillment.mentor.facilities,
-					institute:  itemFulfillment.mentor.institute
+					institute:  itemFulfillment.mentor.institute,
+					image: randomImageURL
 					// aboutMentor: item.tags[1].list[0].descriptor.name,
 					// professionalExperience: item.tags[2].list[0].descriptor.name,
 					// qualification: item.tags[3].list[0].descriptor.name,
