@@ -10,7 +10,7 @@ client.connect()
 
 
 exports.cacheGet = async (key) => {
-	if (key === 'FULLFILLMENT_BLACKLIST') {
+	if (key === 'FULLFILLMENT_BLACKLIST' || key === 'USER_FULLFILLMENT_BLACKLIST') {
 		// Retrieve data as a set
 		const data = await client.sMembers(key);
 		// Parse the strings back to their original format
@@ -27,7 +27,7 @@ exports.listDelete = async (key) => {
 }
 
 exports.cacheSave = async (key, data) => {
-	if (key === 'FULLFILLMENT_BLACKLIST') { 
+	if (key === 'FULLFILLMENT_BLACKLIST' || key === 'USER_FULLFILLMENT_BLACKLIST') { 
 			
 		// Retrieve the current blacklist data (if any)
 		const currentData = await client.sMembers(key);

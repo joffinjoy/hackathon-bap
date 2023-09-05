@@ -25,6 +25,13 @@ exports.confirm = async (req, res) => {
 		const context = await contextBuilder(transactionId, messageId, process.env.CONFIRM_ACTION)
 		if (!itemId || !fulfillmentId) return failedRes('Either itemId Or fulfillmentId id is missing')
 
+		const userFulfillmentBlackListId = userId + "_" +  fulfillmentId
+		const userFulfillmentBlackList = await cacheGet('USER_FULLFILLMENT_BLACKLIST')
+
+		// Check if fulfillmentId exists in the userFulfillmentBlackList array
+		const isConfirmed = userFulfillmentBlackList.includes(userFulfillmentBlackListId);
+		if(isConfirmed)return failedRes('User already fulfilled this item')
+
 		const userProfile = await profileQueries.findByUserId(userId)
 		const user = await userQueries.findById(userId)
 
@@ -59,6 +66,8 @@ exports.confirm = async (req, res) => {
 			delete fulfillment.mentor;
 			delete fulfillment.joinLink;
 		}
+		const userFulfillmentId = userId + "_" +  fulfillment.id
+		await cacheSave('USER_FULLFILLMENT_BLACKLIST', [userFulfillmentId])
 		
 		res.status(200).json({
 			status: true,
@@ -113,7 +122,7 @@ exports.onConfirm = async (req, res) => {
 
 exports.removeList = async (req, res) => {
 	const failedRes = (message) => res.status(400).json({ status: false, message })
-	const availableList = ["FULLFILLMENT_BLACKLIST"]
+	const availableList = ["FULLFILLMENT_BLACKLIST", "USER_FULLFILLMENT_BLACKLIST"]
 	try {
 		const listKey = req.body.listName
 		if(!listKey || !(availableList.includes(listKey))) {
